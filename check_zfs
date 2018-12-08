@@ -503,6 +503,7 @@ my $health="";
 my $dmge="";
 
 my $dedup=0;
+my $ckpoint=0;
 my $expandsz = 0;
 my $frag = 0; 
 
@@ -558,16 +559,32 @@ while (<STAT>)
 		next;
 	}
 
+## NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
+## rpool   448G   309G   139G        -         -      -    69%  1.00x  ONLINE  -
 	
+	elsif (/^NAME\s+SIZE\s+ALLOC\s+FREE\s+CKPOINT\s+EXPANDSZ\s+FRAG\s+CAP\s+DEDUP\s+HEALTH\s+ALTROOT/)
+	{
+		$dedup = 1;
+		$ckpoint = 1;
+		$expandsz = 1;
+		$frag =1; 
+		next;
+	}
 	
 	
 	if (/^${pool}\s+/)
 	{
 		
-		if ($dedup and $expandsz and $frag)
+		if ($dedup and $ckpoint and $expandsz and $frag)
 		{
-			($dummy, $size, $used, $avail,$expandsz, $frag, $cap, $deduprat, $health) = split(/\s+/);
+			($dummy, $size, $used, $avail,$ckpoint, $expandsz, $frag, $cap, $deduprat, $health) = split(/\s+/);
 		}
+
+		elsif ($dedup and $expandsz and $frag)
+		{
+			($dummy, $size, $used, $avail, $cap, $deduprat, $health) = split(/\s+/);
+		}
+
 
 		elsif ($dedup)
 		{
